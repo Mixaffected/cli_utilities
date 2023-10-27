@@ -13,6 +13,7 @@ fn main() {
     match args[1].as_str() {
         "echo" => echo(args),
         "cat" => cat(args),
+        "find" => find(args),
         _ => print_help(),
     }
 }
@@ -71,15 +72,20 @@ fn cat(args: Vec<String>) {
 }
 
 fn find(args: Vec<String>) {
-    if args.len() < 2 {
+    if args.len() < 4 {
         return;
     }
 
-    let start_path = fs::read_dir(&args[2]);
-    let start_path = match start_path {
-        Ok(start_path) => start_path,
+    let target_string = String::from(&args[3]);
+
+    let path = fs::read_dir(&args[2]);
+    let path = match path {
+        Ok(path) => path,
         Err(e) => return println!("An error occured! Error: {}", e),
     };
+
+    // TODO: implement find for finding files and directories
 }
 
+// TODO: implement grep for finding a string in a file
 fn grep(args: Vec<String>) {}
