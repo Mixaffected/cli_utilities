@@ -1,5 +1,5 @@
-use std::fs::{self, File};
-use std::io::Read;
+use std::fs::{self, File, ReadDir};
+use std::io::{self, Read};
 use std::path::Path;
 
 fn main() {
@@ -76,15 +76,62 @@ fn find(args: Vec<String>) {
         return;
     }
 
-    let target_string = String::from(&args[3]);
+    fn get_readdir(start_path: &Path) -> io::Result<ReadDir> {
+        return fs::read_dir(start_path);
+    }
 
-    let path = fs::read_dir(&args[2]);
-    let path = match path {
-        Ok(path) => path,
-        Err(e) => return println!("An error occured! Error: {}", e),
-    };
+    fn search_directory(paths: ReadDir, search_target: &String) -> Vec<String> {
+        let mut results: Vec<String> = Vec::new();
+        for (_, path) in paths.enumerate() {
+            let path = path.unwrap().path();
 
-    // TODO: implement find for finding files and directories
+            if path
+                .clone()
+                .file_name()
+                .unwrap()
+                .to_os_string()
+                .into_string()
+                .unwrap()
+                .to_lowercase()
+                .contains(search_target)
+            {
+                results.push(path.display().to_string());
+            }
+
+            if path.is_dir() {
+                let rdir = get_readdir(&path);
+                let rdir = match rdir {
+                    Ok(rdir) => rdir,
+                    Err(_) => continue,
+                };
+
+                let directory_result = search_directory(rdir, search_target);
+                for result in directory_result {
+                    results.push(result);
+                }
+            }
+        }
+
+        return results;
+    }
+
+    fn display_result(results: Vec<String>) {
+        for (_, str) in results.iter().enumerate() {
+            println!("{}", str);
+        }
+    }
+
+    let start_path = Path::new(&args[2]);
+    let search_target = String::from(&args[3]).to_lowercase();
+
+    if start_path.is_dir() {
+        let results: Vec<String> =
+            search_directory(fs::read_dir(start_path).unwrap(), &search_target);
+        display_result(results);
+    } else {
+        println!("You provided a file. This command only supports directories. Use \"grep\" to search in a file!");
+        return;
+    }
 }
 
 // TODO: implement grep for finding a string in a file
