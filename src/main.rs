@@ -14,6 +14,7 @@ fn main() {
         "echo" => echo(args),
         "cat" => cat(args),
         "find" => find(args),
+        "grep" => grep(args),
         _ => print_help(),
     }
 }
@@ -134,5 +135,38 @@ fn find(args: Vec<String>) {
     }
 }
 
-// TODO: implement grep for finding a string in a file
-fn grep(args: Vec<String>) {}
+fn grep(args: Vec<String>) {
+    if args.len() < 4 {
+        return;
+    }
+
+    let search_file = Path::new(&args[2]);
+    let search_target = String::from(&args[3].to_lowercase());
+
+    let file = File::open(search_file);
+    let mut file = match file {
+        Ok(file) => file,
+        Err(_) => return println!("Could not open file!"),
+    };
+
+    let mut file_contents: String = String::new();
+    let file_read_result = file.read_to_string(&mut file_contents);
+    match file_read_result {
+        Ok(file_read_result) => file_read_result,
+        Err(_) => return println!("Could not read file!"),
+    };
+
+    let lowercase_content = file_contents.to_lowercase();
+    let matches: Vec<_> = lowercase_content
+        .match_indices(search_target.as_str())
+        .collect();
+
+    if matches.len() == 0 {
+        println!("No matches found!");
+        return;
+    }
+
+    for curr_match in matches {
+        println!("Match on character {}", curr_match.0);
+    }
+}
