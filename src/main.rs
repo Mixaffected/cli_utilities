@@ -13,6 +13,7 @@ fn main() {
     match args[1].as_str() {
         "echo" => echo(args),
         "cat" => cat(args),
+        "ls" => ls(args),
         "find" => find(args),
         "grep" => grep(args),
         _ => print_help(),
@@ -25,6 +26,7 @@ fn print_help() {
 
 fn echo(args: Vec<String>) {
     if args.len() <= 2 {
+        println!("Not enough arguments!");
         return;
     }
 
@@ -43,6 +45,7 @@ fn echo(args: Vec<String>) {
 
 fn cat(args: Vec<String>) {
     if args.len() < 2 {
+        println!("Not enough arguments!");
         return;
     }
 
@@ -72,8 +75,39 @@ fn cat(args: Vec<String>) {
     }
 }
 
+fn ls(args: Vec<String>) {
+    if args.len() < 3 {
+        println!("Not enough arguments!");
+        return;
+    }
+
+    let ls_path = Path::new(&args[2]);
+    let child_paths = fs::read_dir(ls_path);
+    let child_paths = match child_paths {
+        Ok(child_paths) => child_paths,
+        Err(_) => return println!("Could not get child paths!"),
+    };
+
+    for path in child_paths {
+        let path = match path {
+            Ok(path) => path,
+            Err(_) => continue,
+        };
+
+        let file_name = path.file_name();
+        let display_path_str = file_name.to_str();
+        let display_path_str = match display_path_str {
+            Some(display_path_str) => display_path_str,
+            None => continue,
+        };
+
+        println!("{}", display_path_str);
+    }
+}
+
 fn find(args: Vec<String>) {
     if args.len() < 4 {
+        println!("Not enough arguments!");
         return;
     }
 
@@ -137,6 +171,7 @@ fn find(args: Vec<String>) {
 
 fn grep(args: Vec<String>) {
     if args.len() < 4 {
+        println!("Not enough arguments!");
         return;
     }
 
