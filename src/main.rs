@@ -63,8 +63,11 @@ fn cat(args: Vec<String>) {
     };
 
     let mut file_contents = String::new();
-    file.read_to_string(&mut file_contents)
-        .expect("Could not load File!");
+    let read_file_result: Result<usize, io::Error> = file.read_to_string(&mut file_contents);
+    match read_file_result {
+        Ok(read_file_result) => read_file_result,
+        Err(_) => return println!("Cant read file!"),
+    };
 
     for (i, line) in file_contents.lines().enumerate() {
         if i > 128 {
@@ -118,7 +121,11 @@ fn find(args: Vec<String>) {
     fn search_directory(paths: ReadDir, search_target: &String) -> Vec<String> {
         let mut results: Vec<String> = Vec::new();
         for (_, path) in paths.enumerate() {
-            let path = path.unwrap().path();
+            let path = path;
+            let path = match path {
+                Ok(path) => path.path(),
+                Err(_) => continue,
+            };
 
             if path
                 .clone()
@@ -160,8 +167,13 @@ fn find(args: Vec<String>) {
     let search_target = String::from(&args[3]).to_lowercase();
 
     if start_path.is_dir() {
-        let results: Vec<String> =
-            search_directory(fs::read_dir(start_path).unwrap(), &search_target);
+        let read_dir_result = fs::read_dir(start_path);
+        let read_dir_result = match read_dir_result {
+            Ok(read_dir_result) => read_dir_result,
+            Err(_) => return print!("Could not get child paths!"),
+        };
+
+        let results: Vec<String> = search_directory(read_dir_result, &search_target);
         display_result(results);
     } else {
         println!("You provided a file. This command only supports directories. Use \"grep\" to search in a file!");
