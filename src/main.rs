@@ -21,12 +21,13 @@ fn main() {
 }
 
 fn print_help() {
-    println!("Help here!");
+    println!("CLI Tools\n");
+    println!("OPTIONS:\necho\ncat\nls\nfind\ngrep");
 }
 
 fn echo(args: Vec<String>) {
     if args.len() <= 2 {
-        println!("Not enough arguments!");
+        println!("echo <Text>");
         return;
     }
 
@@ -45,7 +46,7 @@ fn echo(args: Vec<String>) {
 
 fn cat(args: Vec<String>) {
     if args.len() < 2 {
-        println!("Not enough arguments!");
+        println!("cat <file path>");
         return;
     }
 
@@ -80,7 +81,7 @@ fn cat(args: Vec<String>) {
 
 fn ls(args: Vec<String>) {
     if args.len() < 3 {
-        println!("Not enough arguments!");
+        println!("ls <file path>");
         return;
     }
 
@@ -110,7 +111,7 @@ fn ls(args: Vec<String>) {
 
 fn find(args: Vec<String>) {
     if args.len() < 4 {
-        println!("Not enough arguments!");
+        println!("find <start path> <search string>");
         return;
     }
 
@@ -183,7 +184,7 @@ fn find(args: Vec<String>) {
 
 fn grep(args: Vec<String>) {
     if args.len() < 4 {
-        println!("Not enough arguments!");
+        println!("grep <file path> <search string>");
         return;
     }
 
